@@ -1,0 +1,47 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import pydeck as pdk # Para mapas 3D/Gêmeo Digital
+
+st.set_page_config(layout="wide", page_title="Smart Port Navigator")
+
+st.title("🚢 Smart Port Navigator - CCO")
+st.sidebar.header("Torre de Controle")
+
+# Simulação de dados dos veículos (Pilar 2)
+veiculos = pd.DataFrame({
+    'veiculo': ['Caminhão 01', 'Caminhão 02', 'Escavadeira 05'],
+    'lat': [-2.593, -2.595, -2.591],
+    'lon': [-44.368, -44.370, -44.365],
+    'status': ['Em Rota', 'Manutenção', 'Aguardando Carga']
+})
+
+# Mapa Estilo Gêmeo Digital (Pilar 3)
+st.pydeck_chart(pdk.Deck(
+    map_style='mapbox://styles/mapbox/satellite-v9',
+    initial_view_state=pdk.ViewState(
+        latitude=-2.593,
+        longitude=-44.368,
+        zoom=14,
+        pitch=45,
+    ),
+    layers=[
+        pdk.Layer(
+            'ScatterplotLayer',
+            data=veiculos,
+            get_position='[lon, lat]',
+            get_color='[200, 30, 0, 160]',
+            get_radius=50,
+        ),
+    ],
+))
+
+# Painel de Comunicação M2M e Alertas
+col1, col2 = st.columns(2)
+with col1:
+    st.subheader("Alertas de Geofencing")
+    st.error("⚠️ Veículo 02 entrou em área de interdição operacional!")
+    
+with col2:
+    st.subheader("Solução Rápida (Mensagens)")
+    st.info("💬 Motorista 01: 'Problema mecânico detectado, solicitando apoio.'")
